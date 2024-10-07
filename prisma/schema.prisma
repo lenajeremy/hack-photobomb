@@ -1,0 +1,55 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    email     String   @unique
+    fullName  String   @db.VarChar(255)
+    verified  Boolean  @default(false)
+
+    events Event[]
+    files  File[]
+}
+
+model Event {
+    id          String   @id @default(cuid())
+    name        String
+    slug        String   @unique
+    description String   @default("") @db.Text()
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    eventDate   DateTime
+
+    participants User[]
+    files        File[]
+}
+
+model File {
+    id        String @id @default(cuid())
+    cid       String @unique
+    publicURL String
+    owner     User   @relation(fields: [ownerId], references: [id])
+    ownerId   String
+    event     Event  @relation(fields: [eventId], references: [id])
+    eventId   String
+    upload    Upload @relation(fields: [uploadId], references: [id])
+    uploadId  String
+
+    createdAt DateTime @default(now())
+}
+
+model Upload {
+    id    String  @id @default(cuid())
+    text  String? @db.Text
+    files File[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now())
+}

@@ -11,6 +11,6 @@ export async function POST(request: NextRequest) {
         const res = await Promise.allSettled(files.filter(f => typeof f !== 'string').map(f => pinata.upload.file(f)))
         console.log(res)
     }
-    
+
     return NextResponse.json({ imagesCount: Array.from(files.entries()).length, images: Array.from(files.values()) }, { status: 200 })
 }

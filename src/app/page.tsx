@@ -52,7 +52,7 @@ export default function Home() {
     <form
       method="POST"
       action="/api/e/devfest-lagos-24"
-      className="px-4 h-screen flex flex-col items-center justify-center gap-6"
+      className="px-4 py-20 space-y-6"
       onSubmit={handleSubmit}
       encType="multipart/formdata"
     >

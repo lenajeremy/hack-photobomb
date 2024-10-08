@@ -12,7 +12,8 @@ export default async function ListEvents() {
       <div className="flex flex-col text-center gap-1">
         <h1 className="text-2xl font-semibold">discover events</h1>
         <p className="text-muted-foreground text-sm">
-          discover events that are happening around you or these could be events you've attended before👍
+          discover events that are happening around you or these could be events
+          you&apos;ve attended before👍
         </p>
       </div>
 

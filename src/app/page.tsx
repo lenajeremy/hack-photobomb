@@ -56,6 +56,7 @@ export default function Home() {
       onSubmit={handleSubmit}
       encType="multipart/formdata"
     >
+      <Image src = "/picshaw.png" alt = "" width={120} height={120} />
       <div className="flex flex-col text-center gap-1">
         <h1 className="text-2xl font-semibold">Upload Files</h1>
         <p className="text-muted-foreground text-sm">

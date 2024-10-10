@@ -4,14 +4,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSession, signIn } from "next-auth/react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const { data } = useSession();
   const [email, setEmail] = React.useState("");
 
-  const resendAction = (formData: FormData) => {
-    console.log(formData);
-    signIn("resend", { email });
+  const resendAction: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault()
+    const res = await signIn("resend", {
+      email,
+      redirect: false,
+      redirectTo: "/",
+    });
+    if (res?.error) {
+      toast.error("Failed to send email");
+    } else {
+      toast.success("Check your mail", {
+        description: "email has been sent succesfully",
+      });
+    }
+    console.log(res);
   };
 
   return (
@@ -25,7 +38,7 @@ export default function LoginPage() {
 
       <pre>{JSON.stringify(data, null, 3)}</pre>
 
-      <form className="space-y-2" action={resendAction}>
+      <form className="space-y-2" onSubmit={resendAction}>
         <div>
           <Label>Email:</Label>
           <Input
@@ -44,7 +57,7 @@ export default function LoginPage() {
       <Button
         variant="outline"
         className="flex gap-4 w-full"
-        onClick={() => signIn("google")}
+        onClick={() => signIn("google", { redirect: true, redirectTo: "/" })}
         type="button"
       >
         {" "}

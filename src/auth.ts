@@ -24,16 +24,16 @@ export const authOptions: NextAuthConfig = {
         })
     ],
     adapter: PrismaAdapter(prisma),
-    callbacks: {
-        async signIn(params) {
-            console.log(params, 'signin')
-            return true
-        },
-        session(params) {
-            console.log(params, 'session')
-            return params.session
-        }
-    },
+    // callbacks: {
+    //     async signIn(params) {
+    //         console.log(params, 'signin')
+    //         return true
+    //     },
+    //     session(params) {
+    //         console.log(params, 'session')
+    //         return params.session
+    //     }
+    // },
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth(authOptions)

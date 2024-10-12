@@ -19,7 +19,6 @@ export default function useFetch<C = object, R = object, E = object | undefined>
     const hasRunFetchRef = React.useRef(false)
     const hasArgsChangedRef = React.useRef(false)
     const isInitialRenderRef = React.useRef(true)
-    // const isCancelledRef = React.useRef(false)
 
     const [data, setData] = React.useState<R | undefined>()
     const [error, setError] = React.useState<E | undefined>()
@@ -31,7 +30,7 @@ export default function useFetch<C = object, R = object, E = object | undefined>
             setLoading(true)
             setData(undefined)
             setError(undefined)
-            
+
             const res = await fetch(inputRef.current, { ...initRef.current, body: data instanceof FormData ? data : JSON.stringify(data) })
             const json = await res.json()
 
@@ -66,7 +65,7 @@ export default function useFetch<C = object, R = object, E = object | undefined>
         if ((options?.fetchOnRender && !hasRunFetchRef.current) || (options?.fetchOnArgsChange && hasArgsChangedRef.current)) {
             debouncedTrigger(init?.body as C)
         }
-    }, [options?.fetchOnRender, options?.debouncedDuration, input, init])
+    }, [options, input, init, debouncedTrigger])
 
     return { data, trigger, error, loading }
 }

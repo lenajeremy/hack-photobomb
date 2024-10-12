@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@radix-ui/react-label";
 import { useForm } from "react-hook-form";
 import * as React from "react";
-import { debounce, slugify } from "@/lib/utils";
+import { slugify } from "@/lib/utils";
 import { ApiResponse, CreateEventFormData } from "@/types";
 import useFetch from "@/hooks/useFetch";
 import { toast } from "sonner";

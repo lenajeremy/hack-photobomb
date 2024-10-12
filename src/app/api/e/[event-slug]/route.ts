@@ -11,12 +11,12 @@ export async function POST(request: NextRequest, { params }: { params: { "event-
         return NextResponse.json({ error: "limit of 50 images per request" }, { status: 400 })
     } else {
         const res = await Promise.allSettled(files.filter(f => typeof f !== 'string').map(f => pinata.upload.file(f)))
-        
+        console.log(res)
     }
 
     return NextResponse.json({ imagesCount: Array.from(files.entries()).length, images: Array.from(files.values()) }, { status: 201 })
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     return respondSuccess({ uploads: [], total: 0 }, "Retrieved uploads", 200)
 }

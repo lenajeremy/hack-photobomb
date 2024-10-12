@@ -3,11 +3,10 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useSession, signIn } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 
 export default function LoginPage() {
-  const { data } = useSession();
   const [email, setEmail] = React.useState("");
 
   const resendAction: React.FormEventHandler<HTMLFormElement> = async (e) => {

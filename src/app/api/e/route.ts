@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import prisma from "@/lib/db";
 import { auth } from "@/auth";
 import { respondError, respondSuccess } from "@/lib/utils";

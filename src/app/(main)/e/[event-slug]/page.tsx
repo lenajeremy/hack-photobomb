@@ -13,7 +13,7 @@ export default function Home() {
 
   const [files, setFiles] = React.useState<File[]>([]);
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const { trigger, loading, data } = useFetch<FormData, ApiResponse<{}>>(
+  const { trigger, loading } = useFetch<FormData, ApiResponse<object>>(
     `/api/e/${eventSlug}`,
     {
       method: "POST",

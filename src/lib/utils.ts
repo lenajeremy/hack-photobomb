@@ -22,11 +22,13 @@ export function debounce<T extends Function>(fn: T, seconds: number): T {
   let timer: NodeJS.Timeout | null = null;
 
   return function () {
+
     const args = arguments;
     if (timer) {
       clearTimeout(timer);
     }
     timer = setTimeout(() => {
+      // @ts-expect-error
       fn.apply(this, args);
     }, seconds * 1000);
   } as unknown as T

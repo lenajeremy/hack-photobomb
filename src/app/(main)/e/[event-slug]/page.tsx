@@ -22,7 +22,7 @@ export default function Home() {
   const params = useParams();
   const eventSlug = params["event-slug"];
 
-  const {} = useFetch<void, ApiResponse<Event>>(`/api/e/${eventSlug}`, undefined, {
+  const {loading, data} = useFetch<void, ApiResponse<Event>>(`/api/e/${eventSlug}`, undefined, {
     fetchOnRender: true,
   });
 
@@ -30,7 +30,8 @@ export default function Home() {
 
   return (
     <div>
-<UploadModal />
+      <UploadModal />
+      <pre>{JSON.stringify({loading, data}, null, e)</pre>
     </div>
   );
 }

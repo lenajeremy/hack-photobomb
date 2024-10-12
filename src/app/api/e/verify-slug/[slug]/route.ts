@@ -3,9 +3,6 @@ import { respondError, respondSuccess } from "@/lib/utils";
 
 export async function GET(_: Request, { params }: { params: { slug: string } }) {
     const { slug } = params
-
-    await sleep(10000)
-
     if (slug) {
         const event = await prisma.event.findUnique({
             where: {

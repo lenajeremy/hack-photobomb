@@ -1,9 +1,18 @@
+
+
 import { CreateEventFormData } from "@/types";
 import { NextRequest } from "next/server";
 import { respondError, respondSuccess } from "@/lib/utils";
 import prisma from "@/lib/db";
+import { auth } from "@/auth";
 
 export async function POST(request: NextRequest) {
+    const session = await auth()
+
+    if (session === null) {
+        return respondError(new Error("User not authenticated"), undefined, 401)
+    }
+    
     try {
         const body = await request.json() as CreateEventFormData;
         if (body.name && body.slug && body.description && body.eventDate) {
@@ -12,7 +21,8 @@ export async function POST(request: NextRequest) {
                     name: body.name,
                     slug: body.slug,
                     description: body.description,
-                    eventDate: new Date(body.eventDate)
+                    eventDate: new Date(body.eventDate),
+                    ownerId: session.user?.id ?? ""
                 }
             })
             return respondSuccess(event, "Event created successfully", 200);

@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function Header() {
   const { data, status } = useSession();
   return (
-    <header className="flex items-center justify-between">
+    <header className="flex items-center justify-between p-8 text-2xl">
       <h1>Picshaw</h1>
       {status == "loading" && <p>loading...</p>}
 
@@ -17,7 +17,7 @@ export default function Header() {
         </Button>
       )}
       {status === "authenticated" && (
-        <div className="flex">
+        <div className="flex gap-3 items-center">
           <p>{data.user?.name}</p>
           <Button onClick={() => signOut()}>Sign Out</Button>
         </div>

@@ -1,41 +1,58 @@
 "use client";
-// import { createEvent } from "@/actions/events";
+import { Event } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@radix-ui/react-label";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import * as React from "react";
 import { slugify } from "@/lib/utils";
-import { CreateEventFormData } from "@/types";
+import { ApiResponse, CreateEventFormData } from "@/types";
+import useFetch from "@/hooks/useFetch";
+import { toast } from "sonner";
 
 export default function CreateEvent() {
   const { register, handleSubmit, watch, setValue } =
     useForm<CreateEventFormData>();
   const name = watch("name");
 
+  const {
+    trigger: createEvent,
+    data,
+    loading,
+    error,
+  } = useFetch<CreateEventFormData, ApiResponse<Event>>("/api/e/new", {
+    method: "POST",
+  });
+
+  const handleCreateEvent = React.useCallback(
+    async (data: CreateEventFormData) => {
+      try {
+        const res = await createEvent(data);
+        console.log(res);
+      } catch (err) {
+        console.log("catching a new error");
+        toast.error(JSON.stringify(err));
+        console.log(err);
+      }
+    },
+    [createEvent]
+  );
+
   React.useEffect(() => {
     setValue("slug", slugify(name ?? ""));
   }, [name, setValue]);
 
-  const createEvent: SubmitHandler<CreateEventFormData> = React.useCallback(
-    async (data) => {
-      const res = await fetch("/api/e/new", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      const json = await res.json();
-      console.log(json);
-    },
-    []
-  );
+  // React.useEffect(() => {
+  //   console.log(error)
+  //   if (error) {
+  //     toast.error(JSON.stringify(error));
+  //   }
+  // }, [error]);
 
   return (
     <div className="p-4">
-      <form onSubmit={handleSubmit(createEvent)}>
+      <form onSubmit={handleSubmit(handleCreateEvent)}>
         <div className="flex flex-col text-center gap-1">
           <h1 className="text-2xl font-semibold">create event</h1>
           <p className="text-muted-foreground text-sm">create a new event👍</p>
@@ -76,8 +93,11 @@ export default function CreateEvent() {
               {...register("description")}
             />
           </div>
-          <Button className="w-full bg-purple-500 text-white">create</Button>
+          <Button loading={loading} className="w-full bg-purple-500 text-white">
+            create
+          </Button>
         </div>
+        <pre>{JSON.stringify({ error, data }, null, 3)}</pre>
       </form>
     </div>
   );

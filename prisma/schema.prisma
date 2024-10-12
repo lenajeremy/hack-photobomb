@@ -47,19 +47,20 @@ model VerificationToken {
 }
 
 model User {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    name          String @default("User")
+    id            String    @id @default(cuid())
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+    name          String    @default("User")
     email         String?   @unique
     emailVerified DateTime? @map("email_verified")
     image         String?
     accounts      Account[]
     sessions      Session[]
-    events Event[]
-    files  File[]
+    events        Event[]
+    files         File[]
 
     @@map("users")
+    Event Event[] @relation(name: "events")
 }
 
 model Event {
@@ -70,6 +71,9 @@ model Event {
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
     eventDate   DateTime
+
+    ownerId String
+    owner   User   @relation(name: "events", fields: [ownerId], references: [id], onDelete: Cascade)
 
     participants User[]
     files        File[]

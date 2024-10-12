@@ -3,11 +3,22 @@ import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import useFetch from "@/hooks/useFetch";
+import { useParams } from "next/navigation";
+import { ApiResponse } from "@/types";
 
 export default function Home() {
+  const params = useParams();
+  const eventSlug = params["event-slug"];
+
   const [files, setFiles] = React.useState<File[]>([]);
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const [loading, setLoading] = React.useState(false);
+  const { trigger, loading, data } = useFetch<FormData, ApiResponse<{}>>(
+    `/api/e/${eventSlug}`,
+    {
+      method: "POST",
+    }
+  );
 
   const filesUrl = React.useMemo(
     () => files.map((f) => URL.createObjectURL(f)),
@@ -24,8 +35,6 @@ export default function Home() {
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
     try {
       const formdata = new FormData();
 
@@ -34,16 +43,10 @@ export default function Home() {
         formdata.set(`image-${i + 1}`, file, file.name);
       }
 
-      const res = await fetch("/api/e/devfest-lagos-24", {
-        method: "POST",
-        body: formdata,
-      });
-      const data = await res.json();
+      const data = trigger(formdata);
       console.log(data);
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -55,7 +58,7 @@ export default function Home() {
       onSubmit={handleSubmit}
       encType="multipart/formdata"
     >
-      <Image src="/picshaw.png" alt="" width={120} height={120} />
+      {/* <Image src="/picshaw.png" alt="" width={120} height={120} /> */}
       <div className="flex flex-col text-center gap-1">
         <h1 className="text-2xl font-semibold">Upload Files</h1>
         <p className="text-muted-foreground text-sm">

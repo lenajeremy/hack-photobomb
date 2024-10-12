@@ -23,7 +23,7 @@ export default async function ListEvents() {
             <h2 className="text-xl font-semibold">{e.name}</h2>
             <p className="text-muted-foreground">{e.description}</p>
             <p>Date: {e.eventDate.toLocaleDateString()}</p>
-            <p>Time: {e.eventDate.toLocaleTimeString()}</p>
+            {/* <p>Time: {e.eventDate.toLocaleTimeString()}</p> */}
           </div>
         ))}
       </div>

@@ -36,8 +36,6 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <pre>{JSON.stringify(data, null, 3)}</pre>
-
       <form className="space-y-2" onSubmit={resendAction}>
         <div>
           <Label>Email:</Label>

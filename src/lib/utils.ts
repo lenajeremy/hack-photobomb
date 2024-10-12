@@ -17,3 +17,17 @@ export function respondError(error: Error, message?: string, status?: number) {
 export function respondSuccess(data: unknown, message?: string, status?: number) {
   return NextResponse.json({ data, error: null, message: message ?? "Successful" }, { status: status ?? 200 });
 }
+
+export function debounce<T extends Function>(fn: T, seconds: number): T {
+  let timer: NodeJS.Timeout | null = null;
+
+  return function () {
+    const args = arguments;
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, seconds * 1000);
+  } as unknown as T
+};

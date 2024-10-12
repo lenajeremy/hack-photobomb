@@ -1,11 +1,13 @@
-export default function Loader() {
+import { cn } from "@/lib/utils"
+
+export default function Loader({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="currentColor"
       viewBox="0 0 24 24"
       data-testid="loader"
-      className="h-auto w-[22px] text-current scale-95"
+      className={cn("h-auto w-[22px] text-current scale-95", className)}
     >
       <g>
         <path d="M11 1h2v5h-2z" opacity="0.14"></path>

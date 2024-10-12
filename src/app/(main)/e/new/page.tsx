@@ -6,15 +6,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@radix-ui/react-label";
 import { useForm } from "react-hook-form";
 import * as React from "react";
-import { slugify } from "@/lib/utils";
+import { debounce, slugify } from "@/lib/utils";
 import { ApiResponse, CreateEventFormData } from "@/types";
 import useFetch from "@/hooks/useFetch";
 import { toast } from "sonner";
+import Loader from "@/components/ui/loader";
 
 export default function CreateEvent() {
   const { register, handleSubmit, watch, setValue } =
-    useForm<CreateEventFormData>();
+    useForm<CreateEventFormData>({
+      defaultValues: {
+        name: "",
+        slug: "",
+      },
+    });
   const name = watch("name");
+  const slug = watch("slug");
 
   const {
     trigger: createEvent,
@@ -24,6 +31,16 @@ export default function CreateEvent() {
   } = useFetch<CreateEventFormData, ApiResponse<Event>>("/api/e/new", {
     method: "POST",
   });
+
+  const {
+    loading: verifySlugLoading,
+    error: verifySlugError,
+    data: verifySlugData,
+  } = useFetch<void, ApiResponse<boolean>, ApiResponse<boolean>>(
+    `/api/e/verify-slug/${slug}`,
+    undefined,
+    { debouncedDuration: 0.5, fetchOnArgsChange: true }
+  );
 
   const handleCreateEvent = React.useCallback(
     async (data: CreateEventFormData) => {
@@ -40,15 +57,9 @@ export default function CreateEvent() {
   );
 
   React.useEffect(() => {
-    setValue("slug", slugify(name ?? ""));
+    const slug = slugify(name ?? "");
+    setValue("slug", slug);
   }, [name, setValue]);
-
-  // React.useEffect(() => {
-  //   console.log(error)
-  //   if (error) {
-  //     toast.error(JSON.stringify(error));
-  //   }
-  // }, [error]);
 
   return (
     <div className="p-4">
@@ -69,10 +80,31 @@ export default function CreateEvent() {
 
           <div className="space-y-1">
             <Label className="text-sm">url path:</Label>
-            <Input
-              placeholder="unique url path for your event"
-              {...register("slug", { required: true })}
-            />
+            <div className="space-y-2">
+              <Input
+                placeholder="unique url path for your event"
+                {...register("slug", { required: true })}
+              />
+              <p className="text-xs">
+                {verifySlugLoading && (
+                  <span className="inline-flex gap-2 text-muted-foreground">
+                    <Loader className="w-[18px]" />
+                    <span>Verifying slug availability...</span>
+                  </span>
+                )}
+
+                {verifySlugError && (
+                  <span className="text-red-500">
+                    <span>Slug is already taken</span>
+                  </span>
+                )}
+                {verifySlugData && (
+                  <span className="text-green-600">
+                    <span>Slug is available</span>
+                  </span>
+                )}
+              </p>
+            </div>
           </div>
 
           <div className="space-y-1">

@@ -1,13 +1,45 @@
 "use client";
 import * as React from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import useFetch from "@/hooks/useFetch";
 import { useParams } from "next/navigation";
 import { ApiResponse } from "@/types";
+import { Event } from "@prisma/client";
 
 export default function Home() {
+  const params = useParams();
+  const eventSlug = params["event-slug"];
+
+  const {
+    data: eventData,
+    error: eventError,
+    loading: eventLoading,
+  } = useFetch<void, ApiResponse<Event>>(`/api/e/${eventSlug}`, undefined, {
+    fetchOnRender: true,
+  });
+
+  const [select, setSelect] = React.useState(false);
+
+  return (
+    <div>
+      <div className="flex flex-col text-center gap-1"></div>
+    </div>
+  );
+}
+
+function UploadModal({ onClose }: { onClose: () => void }) {
   const params = useParams();
   const eventSlug = params["event-slug"];
 
@@ -24,14 +56,6 @@ export default function Home() {
     () => files.map((f) => URL.createObjectURL(f)),
     [files]
   );
-
-  React.useEffect(() => {
-    console.log(files);
-    // const properties = ["webkitdirectory", "directory"];
-    // for (const prop of properties) {
-    // inputRef.current?.setAttribute(prop, "");
-    // }
-  }, [files]);
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -51,49 +75,57 @@ export default function Home() {
   };
 
   return (
-    <form
-      method="POST"
-      action="/api/e/devfest-lagos-24"
-      className="px-4 py-20 space-y-6"
-      onSubmit={handleSubmit}
-      encType="multipart/formdata"
-    >
-      {/* <Image src="/picshaw.png" alt="" width={120} height={120} /> */}
-      <div className="flex flex-col text-center gap-1">
-        <h1 className="text-2xl font-semibold">Upload Files</h1>
-        <p className="text-muted-foreground text-sm">
-          Upload files that you want to be added to the repository
-        </p>
-      </div>
-      <Input
-        onChange={(e) => setFiles(Array.from(e.currentTarget.files || []))}
-        type="file"
-        name="files"
-        multiple
-        accept="image/*"
-        ref={inputRef}
-      />
-      {files.length == 0 ? (
-        <div>
-          <p>No files selected</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-4 md:grid-cols-8 gap-1">
-          {filesUrl.map((f) => (
-            <Image
-              src={f}
-              width={400}
-              height={400}
-              alt=""
-              className="aspect-square object-cover"
-              key={f}
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Upload Images</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[800px]">
+        <DialogHeader>
+          <DialogTitle>Upload Files</DialogTitle>
+          <DialogDescription>
+            Select images that you want to be added to the repository.
+          </DialogDescription>
+        </DialogHeader>
+        <form className="py-4" onSubmit={handleSubmit}>
+          <div className="items-center gap-4">
+            <Label htmlFor="files" className="text-right">
+              Select files
+            </Label>
+            <Input
+              onChange={(e) =>
+                setFiles(Array.from(e.currentTarget.files || []))
+              }
+              type="file"
+              name="files"
+              multiple
+              accept="image/*"
+              ref={inputRef}
             />
-          ))}
-        </div>
-      )}
-      <Button className="w-full" disabled={loading}>
-        {loading ? "Loading..." : "Upload"}
-      </Button>
-    </form>
+          </div>
+          {files.length === 0 ? (
+            <div>
+              <p>No files selected</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-1">
+              {filesUrl.map((f) => (
+                <Image
+                  src={f}
+                  width={400}
+                  height={400}
+                  alt=""
+                  className="aspect-square object-cover"
+                  key={f}
+                />
+              ))}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button type="submit">Save changes</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <div>
       <UploadModal />
-      <pre>{JSON.stringify({loading, data}, null, e)</pre>
+      <pre>{JSON.stringify({loading, data}, null, e)}</pre>
     </div>
   );
 }

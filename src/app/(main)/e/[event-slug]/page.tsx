@@ -22,17 +22,26 @@ export default function Home() {
   const params = useParams();
   const eventSlug = params["event-slug"];
 
-  const { loading, data } = useFetch<void, GetUploadsResponse>(
-    `/api/e/${eventSlug}`,
-    undefined,
-    {
-      fetchOnRender: true,
-    }
-  );
+  const {
+    loading,
+    data,
+    trigger: getEventDetails,
+  } = useFetch<void, GetUploadsResponse>(`/api/e/${eventSlug}`, undefined, {
+    fetchOnRender: true,
+  });
 
   return (
     <div>
-      {/* <UploadModal /> */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold">{data?.data.name}</h1>
+          <UploadModal onUploadSuccess={getEventDetails} />
+        </div>
+        <p className="text-muted-foreground text-sm w-4/5">
+          {data?.data.description}
+        </p>
+      </div>
+
       {loading && (
         <div className="flex gap-2">
           <p>Loading...</p>
@@ -126,9 +135,10 @@ function PhotosGallery({
   );
 }
 
-function _() {
+function UploadModal({ onUploadSuccess }: { onUploadSuccess: Function }) {
   const params = useParams();
   const eventSlug = params["event-slug"];
+  const [open, setOpen] = React.useState(false);
 
   const [files, setFiles] = React.useState<File[]>([]);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -154,19 +164,20 @@ function _() {
         formdata.set(`image-${i + 1}`, file, file.name);
       }
 
-      const data = trigger(formdata);
-      console.log(data);
+      await trigger(formdata);
+      setOpen(false);
+      onUploadSuccess();
     } catch (error) {
       console.error(error);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Upload Images</Button>
+        <Button size={"sm"}>Upload Images</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Upload Files</DialogTitle>
           <DialogDescription>
@@ -190,11 +201,13 @@ function _() {
             />
           </div>
           {files.length === 0 ? (
-            <div>
-              <p>No files selected</p>
+            <div className="my-4 py-8">
+              <p className="text-sm text-muted-foreground text-center">
+                No files selected
+              </p>
             </div>
           ) : (
-            <div className="grid grid-cols-4 md:grid-cols-8 gap-1">
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-1 my-4">
               {filesUrl.map((f) => (
                 <Image
                   src={f}
@@ -218,5 +231,3 @@ function _() {
     </Dialog>
   );
 }
-
-console.log(_)

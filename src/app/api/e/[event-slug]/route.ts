@@ -92,8 +92,11 @@ export async function GET(req: NextRequest, { params }: { params: { "event-slug"
                 }
             }
         },
-        take: 20,
+        orderBy: {
+            createdAt: "desc"
+        },
+        take: 30,
     })
 
-    return respondSuccess({ uploads, total: uploads.length }, "Retrieved uploads", 200)
+    return respondSuccess({ ...event, uploads, total: uploads.length }, "Retrieved uploads", 200)
 }

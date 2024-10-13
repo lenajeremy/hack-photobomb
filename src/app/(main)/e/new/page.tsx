@@ -11,8 +11,10 @@ import { ApiResponse, CreateEventFormData } from "@/types";
 import useFetch from "@/hooks/useFetch";
 import { toast } from "sonner";
 import Loader from "@/components/ui/loader";
+import { useRouter } from "next/navigation";
 
 export default function CreateEvent() {
+  const router = useRouter();
   const { register, handleSubmit, watch, setValue } =
     useForm<CreateEventFormData>({
       defaultValues: {
@@ -20,15 +22,14 @@ export default function CreateEvent() {
         slug: "",
       },
     });
+
   const name = watch("name");
   const slug = watch("slug");
 
-  const {
-    trigger: createEvent,
-    data,
-    loading,
-    error,
-  } = useFetch<CreateEventFormData, ApiResponse<Event>>("/api/e/new", {
+  const { trigger: createEvent, loading } = useFetch<
+    CreateEventFormData,
+    ApiResponse<Event>
+  >("/api/e/new", {
     method: "POST",
   });
 
@@ -46,9 +47,9 @@ export default function CreateEvent() {
     async (data: CreateEventFormData) => {
       try {
         const res = await createEvent(data);
-        console.log(res);
+        toast.success("Event created successfully");
+        router.push("/e/" + res?.data.slug);
       } catch (err) {
-        console.log("catching a new error");
         toast.error(JSON.stringify(err));
         console.log(err);
       }
@@ -98,6 +99,7 @@ export default function CreateEvent() {
                     <span>Slug is already taken</span>
                   </span>
                 )}
+
                 {verifySlugData && (
                   <span className="text-green-600">
                     <span>Slug is available</span>
@@ -129,7 +131,6 @@ export default function CreateEvent() {
             create
           </Button>
         </div>
-        <pre>{JSON.stringify({ error, data }, null, 3)}</pre>
       </form>
     </div>
   );

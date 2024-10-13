@@ -1,4 +1,4 @@
-import { Upload } from "@prisma/client";
+import { Upload, Event } from "@prisma/client";
 export type CreateEventFormData = {
     name: string;
     slug: string;
@@ -20,4 +20,4 @@ export type GetUploadsResponse = ApiResponse<{
         }[];
     })[];
     total: number;
-}>
+} & Event>

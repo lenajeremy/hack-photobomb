@@ -99,7 +99,7 @@ function UploadModal() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Upload Images</Button>
+        <Button>Upload Images</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>

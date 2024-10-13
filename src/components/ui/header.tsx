@@ -27,7 +27,7 @@ export default function Header() {
 
   const { data, status } = useSession();
   return (
-    <header className="flex items-center justify-between container mx-auto py-4">
+    <header className="flex items-center justify-between container mx-auto p-4 border-b">
       <Link href={"/"}>
         {resolvedTheme === "dark" ? (
           <Image

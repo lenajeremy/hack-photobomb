@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import * as React from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
@@ -12,8 +12,7 @@ export default function ProtectedRoutes({
 
   if (status === "loading") {
     return (
-      <div className="h-screen w-screen">
-        <p>Loading...</p>
+      <div className="h-screen flex items-center justify-center gap-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="currentColor"
@@ -51,6 +50,7 @@ export default function ProtectedRoutes({
             ></animateTransform>
           </g>
         </svg>
+        <p className="text-sm opacity-60">Loading...</p>
       </div>
     );
   }

@@ -9,7 +9,7 @@ export default async function Layout({
   return (
     <ProtectedRoutes>
       <Header />
-      {children}
+      <div className="p-4">{children}</div>
     </ProtectedRoutes>
   );
 }

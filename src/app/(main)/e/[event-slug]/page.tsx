@@ -22,24 +22,21 @@ export default function Home() {
   const params = useParams();
   const eventSlug = params["event-slug"];
 
-  const {
-    data: eventData,
-    error: eventError,
-    loading: eventLoading,
-  } = useFetch<void, ApiResponse<Event>>(`/api/e/${eventSlug}`, undefined, {
+  const {loading, data} = useFetch<void, ApiResponse<Event>>(`/api/e/${eventSlug}`, undefined, {
     fetchOnRender: true,
   });
 
-  const [select, setSelect] = React.useState(false);
+  // const [select, setSelect] = React.useState(false);
 
   return (
     <div>
-      <div className="flex flex-col text-center gap-1"></div>
+      <UploadModal />
+      <pre>{JSON.stringify({loading, data}, null, 3)}</pre>
     </div>
   );
 }
 
-function UploadModal({ onClose }: { onClose: () => void }) {
+function UploadModal() {
   const params = useParams();
   const eventSlug = params["event-slug"];
 
@@ -122,7 +119,7 @@ function UploadModal({ onClose }: { onClose: () => void }) {
           )}
 
           <DialogFooter>
-            <Button type="submit">Save changes</Button>
+            <Button loading ={loading} type="submit">Save changes</Button>
           </DialogFooter>
         </form>
       </DialogContent>

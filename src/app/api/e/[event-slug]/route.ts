@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { pinata } from "@/lib/pinata";
 import { respondError, respondSuccess } from "@/lib/utils";
 import prisma from "@/lib/db";
@@ -24,7 +24,9 @@ export async function POST(request: NextRequest, { params }: { params: { "event-
         }
 
         if (files.length > 50) {
-            return NextResponse.json({ error: "limit of 50 images per request" }, { status: 400 })
+            return respondError(new Error("Limit of 50 files per request"), "Too many files", 400)
+        } else if (files.length === 0) {
+            return respondError(new Error("At least one file is required"), "No files", 400)
         }
 
         const res = await Promise.allSettled(files.filter(f => typeof f !== 'string').map(f => pinata.upload.file(f)))

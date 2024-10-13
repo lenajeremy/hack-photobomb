@@ -8,11 +8,6 @@ import { ApiResponse } from "@/types";
 import { Event } from "@prisma/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const metadata = {
-  title: "Picshaw - Share memories at events",
-  description:
-    "Capture and share unforgettable moments from any event with ease. Our app allows users to create event-specific photo galleries where guests can upload images from weddings, birthdays, and other special occasions.",
-};
 
 export default function Home() {
   const { loading, data, error } = useFetch<void, ApiResponse<Event[]>>(

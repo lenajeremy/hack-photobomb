@@ -16,7 +16,6 @@ export async function POST(request: NextRequest, { params }: { params: { "event-
     const files = Array.from(form.values())
     const eventSlug = params["event-slug"]
 
-
     try {
         const event = await prisma.event.findUnique({ where: { slug: eventSlug } })
 
@@ -74,6 +73,10 @@ export async function GET(req: NextRequest, { params }: { params: { "event-slug"
             slug: params["event-slug"]
         }
     })
+
+    if (!event) {
+        return respondError(new Error("Event not found"), "Event not found", 404)
+    }
 
     const uploads = await prisma.upload.findMany({
         where: {

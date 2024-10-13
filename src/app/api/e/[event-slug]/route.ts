@@ -47,7 +47,7 @@ export async function POST(request: NextRequest, { params }: { params: { "event-
                             return {
                                 ownerId: session.user?.id ?? "",
                                 eventId: event?.id ?? "",
-                                cid: file.cid,
+                                cid: file.id,
                                 publicURL: file.publicURL,
                             }
                         })
@@ -64,8 +64,6 @@ export async function POST(request: NextRequest, { params }: { params: { "event-
 
 
 export async function GET(req: NextRequest, { params }: { params: { "event-slug": string } }) {
-
-    const eventSlug = params["event-slug"]
     const session = await auth()
     if (!session || !session.user) {
         return respondError(new Error("Unauthorized"), "Unauthorized", 401)
@@ -80,6 +78,14 @@ export async function GET(req: NextRequest, { params }: { params: { "event-slug"
     const uploads = await prisma.upload.findMany({
         where: {
             eventId: event?.id
+        },
+        include: {
+            files: {
+                select: {
+                    publicURL: true,
+                    id: true
+                }
+            }
         },
         take: 20,
     })

@@ -15,23 +15,48 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import useFetch from "@/hooks/useFetch";
 import { useParams } from "next/navigation";
-import { ApiResponse } from "@/types";
-import { Event } from "@prisma/client";
+import { ApiResponse, GetUploadsResponse } from "@/types";
+import Loader from "@/components/ui/loader";
 
 export default function Home() {
   const params = useParams();
   const eventSlug = params["event-slug"];
 
-  const {loading, data} = useFetch<void, ApiResponse<Event>>(`/api/e/${eventSlug}`, undefined, {
-    fetchOnRender: true,
-  });
+  const { loading, data } = useFetch<void, GetUploadsResponse>(
+    `/api/e/${eventSlug}`,
+    undefined,
+    {
+      fetchOnRender: true,
+    }
+  );
 
   // const [select, setSelect] = React.useState(false);
 
   return (
     <div>
       <UploadModal />
-      <pre>{JSON.stringify({loading, data}, null, 3)}</pre>
+      {loading && (
+        <div className="flex gap-2">
+          <p>Loading...</p>
+          <Loader />
+        </div>
+      )}
+      {data && (
+        <div className="space-y-4">
+          {data.data.uploads.map((upload) => (
+            <div key={upload.id}>
+              <Image
+                src={upload.files[0].publicURL}
+                width={400}
+                height={400}
+                alt=""
+                className="aspect-square object-cover"
+              />
+              <p>{upload.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -119,7 +144,9 @@ function UploadModal() {
           )}
 
           <DialogFooter>
-            <Button loading ={loading} type="submit">Save changes</Button>
+            <Button loading={loading} type="submit">
+              Save changes
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

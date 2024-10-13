@@ -63,10 +63,10 @@ function PhotosGallery({
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.classList.remove(
-            "scale-95",
+            "scale-[98%]",
             "opacity-70",
-            "blur-[6px]",
-            "brightness-125"
+            "blur-[2px]",
+            "brightness-75"
           );
           entry.target.classList.add(
             "scale-100",
@@ -82,10 +82,10 @@ function PhotosGallery({
             "brightness-100"
           );
           entry.target.classList.add(
-            "scale-95",
+            "scale-[98%]",
             "opacity-70",
-            "blur-[6px]",
-            "brightness-125"
+            "blur-[2px]",
+            "brightness-75"
           );
         }
       });
@@ -107,7 +107,7 @@ function PhotosGallery({
       {photos.map((file) => (
         <div
           key={file.id}
-          className="h-[90%] w-full relative bg-slate-400 rounded overflow-hidden image-content transition-all duration-1000"
+          className="h-[95%] w-full relative bg-slate-400 rounded overflow-hidden image-content transition-all duration-1000"
           style={{ scrollSnapAlign: "center" }}
         >
           <Image

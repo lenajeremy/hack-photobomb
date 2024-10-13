@@ -39,6 +39,8 @@ export async function POST(request: NextRequest, { params }: { params: { "event-
         const dbUpload = await prisma.upload.create({
             data: {
                 text: `${session.user.name} uploaded ${files.length} images for ${event?.name}`,
+                ownerId: session.user?.id ?? "",
+                eventId: event?.id ?? "",
                 files: {
                     createMany: {
                         data: uploadsWithPublicURL.map(file => {
@@ -58,11 +60,29 @@ export async function POST(request: NextRequest, { params }: { params: { "event-
     } catch (error) {
         return respondError(error instanceof Error ? error : new Error(String(error)), "Failed to get user events", 500);
     }
-
-
-
 }
 
-export async function GET() {
-    return respondSuccess({ uploads: [], total: 0 }, "Retrieved uploads", 200)
+
+export async function GET(req: NextRequest, { params }: { params: { "event-slug": string } }) {
+
+    const eventSlug = params["event-slug"]
+    const session = await auth()
+    if (!session || !session.user) {
+        return respondError(new Error("Unauthorized"), "Unauthorized", 401)
+    }
+
+    const event = await prisma.event.findUnique({
+        where: {
+            slug: params["event-slug"]
+        }
+    })
+
+    const uploads = await prisma.upload.findMany({
+        where: {
+            eventId: event?.id
+        },
+        take: 20,
+    })
+
+    return respondSuccess({ uploads, total: uploads.length }, "Retrieved uploads", 200)
 }

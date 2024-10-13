@@ -56,11 +56,12 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    events        Event[]
     files         File[]
+    events        Event[]   @relation(name: "events")
+    uploads       Upload[]  @relation(name: "uploads")
+    Event         Event[]
 
     @@map("users")
-    Event Event[] @relation(name: "events")
 }
 
 model Event {
@@ -77,6 +78,7 @@ model Event {
 
     participants User[]
     files        File[]
+    uploads      Upload[] @relation(name: "uploads")
 
     @@map("events")
 }
@@ -103,6 +105,12 @@ model Upload {
     files     File[]
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now())
+
+    ownerId String
+    owner   User   @relation(name: "uploads", fields: [ownerId], references: [id], onDelete: Cascade)
+
+    eventId String
+    event   Event  @relation(name: "uploads", fields: [eventId], references: [id], onDelete: Cascade)
 
     @@map("uploads")
 }

@@ -40,12 +40,13 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
-  .dark, [data-theme='dark'] {
-    --background: 20 14.3% 4.1%;
+  .dark,
+  [data-theme="dark"] {
+    --background: 0 0% 8.63%;
     --foreground: 60 9.1% 97.8%;
     --card: 20 14.3% 4.1%;
     --card-foreground: 60 9.1% 97.8%;
-    --popover: 20 14.3% 4.1%;
+    --popover: 0 0% 9%;
     --popover-foreground: 60 9.1% 97.8%;
     --primary: 270.74 91.01% 65.1%;
     --primary-foreground: 24 9.8% 10%;
@@ -53,11 +54,11 @@ body {
     --secondary-foreground: 60 9.1% 97.8%;
     --muted: 12 6.5% 15.1%;
     --muted-foreground: 24 5.4% 63.9%;
-    --accent: 12 6.5% 15.1%;
+    --accent: 0 0% 10.98%;
     --accent-foreground: 60 9.1% 97.8%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 60 9.1% 97.8%;
-    --border: 12 6.5% 15.1%;
+    --border: 0 0% 10.98%;
     --input: 12 6.5% 15.1%;
     --ring: 24 5.7% 82.9%;
     --chart-1: 220 70% 50%;

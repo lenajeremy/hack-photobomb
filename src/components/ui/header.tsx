@@ -33,15 +33,15 @@ export default function Header() {
           <Image
             src={"/picshaw-dark.svg"}
             alt="Picshaw Logo"
-            width={120}
-            height={40}
+            width={100}
+            height={36}
           />
         ) : (
           <Image
             src={"/picshaw.svg"}
             alt="Picshaw Logo"
-            width={120}
-            height={40}
+            width={100}
+            height={36}
           />
         )}
       </Link>

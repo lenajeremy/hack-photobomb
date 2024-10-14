@@ -7,7 +7,6 @@ import useFetch from "@/hooks/useFetch";
 import { ApiResponse } from "@/types";
 import { Event } from "@prisma/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import EmptyState from "@/components/ui/empty";
 import EventCard from "@/components/ui/event-card";
 

@@ -11,7 +11,7 @@ export default function EventCard({
   event: Event & { attendees: number };
 }) {
   return (
-    <Card className="backdrop-blur-md border-accent overflow-hidden group hover:shadow-lg transition-all duration-200">
+    <Card className="backdrop-blur-md bg-border border-accent overflow-hidden group hover:shadow-lg transition-all duration-200">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div className="flex gap-2 items-center">

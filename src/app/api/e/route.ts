@@ -16,18 +16,17 @@ export async function GET() {
                             userId: session.user?.id
                         },
                     }
-                }
-            })
+                },
+                include: {
+                    _count: {
+                        select: {
+                            participants: true,
+                        },
+                    },
+                },
+            }).then(events => events.map(event => ({ ...event, attendees: event._count.participants })))
 
-            const userEventsWithAttendees = await Promise.all(userEvents.map(async e => ({
-                ...e, attendees: await prisma.eventParticipant.count({
-                    where: {
-                        eventId: e.id
-                    }
-                })
-            })))
-
-            return respondSuccess(userEventsWithAttendees, "Events retrieved successfully", 200)
+            return respondSuccess(userEvents, "Events retrieved successfully", 200)
         } catch (error) {
             console.log(error)
             respondError(error instanceof Error ? error : new Error(String(error)), "Failed to get user events", 500);

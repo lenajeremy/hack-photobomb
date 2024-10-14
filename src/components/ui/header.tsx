@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Moon, Sun, Laptop, User } from "lucide-react";
+import { LogOut, Moon, Sun, Laptop, User, Earth } from "lucide-react";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -71,7 +71,13 @@ export default function Header() {
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48" align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>Extras</DropdownMenuLabel>
+              <DropdownMenuItem asChild>
+                <Link href="/e">
+                  <Earth className="mr-2 h-4 w-4" />
+                  <span>Discover Events</span>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem>

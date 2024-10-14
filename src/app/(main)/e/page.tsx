@@ -1,24 +1,39 @@
 import { auth } from "@/auth";
 import EmptyState from "@/components/ui/empty";
+import EventCard from "@/components/ui/event-card";
 import prisma from "@/lib/db";
 import * as React from "react";
 
 export default async function ListEvents() {
   const session = await auth();
-  const events = await prisma.event.findMany({
-    where: {
-      isPrivate: false,
-      OR: [{ ownerId: session?.user?.id }],
-    },
-    skip: 0,
-    take: 20,
-  });
+  const events = await prisma.event
+    .findMany({
+      where: {
+        isPrivate: false,
+        OR: [{ ownerId: session?.user?.id }],
+      },
+      include: {
+        _count: {
+          select: {
+            participants: true, // Count participants for each event
+          },
+        },
+      },
+      skip: 0,
+      take: 20,
+    })
+    .then((events) =>
+      events.map((event) => ({
+        ...event,
+        attendees: event._count.participants,
+      }))
+    );
 
   return (
-    <div className="p-4">
-      <div className="flex flex-col text-center gap-1">
-        <h1 className="text-2xl font-semibold">Discover Events</h1>
-        <p className="text-muted-foreground text-sm">
+    <div>
+      <div className="flex flex-col gap-1">
+        <h1 className="text-xl font-semibold">Discover Events</h1>
+        <p className="text-muted-foreground text-sm w-4/5">
           Discover events that are happening around you or these could be events
           you&apos;ve attended before👍
         </p>
@@ -27,12 +42,7 @@ export default async function ListEvents() {
       <div>
         {events.length === 0 && <EmptyState width="200" height="200" />}
         {events.map((e) => (
-          <div key={e.id} className="p-2">
-            <h2 className="text-xl font-semibold">{e.name}</h2>
-            <p className="text-muted-foreground">{e.description}</p>
-            <p>Date: {e.eventDate.toLocaleDateString()}</p>
-            {/* <p>Time: {e.eventDate.toLocaleTimeString()}</p> */}
-          </div>
+          <EventCard key={e.id} event={e} />
         ))}
       </div>
     </div>

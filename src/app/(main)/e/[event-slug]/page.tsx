@@ -55,7 +55,6 @@ export default function Home() {
         title: `Click to join "${data?.data.name}" event`,
         url: `${window.location.origin}/join/${res?.data.link}`,
       };
-      await navigator.clipboard.writeText(d.url);
       const shareres = await navigator.share(d);
       console.log(shareres);
       toast.success("Link shared successfully");

@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/db";
 import { respondError, respondSuccess } from "@/lib/utils";
-import { EventParticipant } from "@prisma/client";
 import { NextRequest } from "next/server";
 
 export async function POST(_: NextRequest, { params }: { params: { id: string } }) {
@@ -65,7 +64,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
             return respondError(new Error("Invalid link"), undefined, 404)
         }
 
-        let participant: any;
+        let participant: unknown;
 
         participant = await prisma.eventParticipant.findFirst({
             where: {

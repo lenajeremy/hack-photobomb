@@ -62,7 +62,7 @@ export default function Home() {
     } catch (err) {
       toast.error(JSON.stringify(err));
     }
-  }, [data]);
+  }, [data, createShareLink]);
 
   return (
     <div>

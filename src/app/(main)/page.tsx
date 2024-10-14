@@ -7,7 +7,7 @@ import useFetch from "@/hooks/useFetch";
 import { ApiResponse } from "@/types";
 import { Event } from "@prisma/client";
 import { Skeleton } from "@/components/ui/skeleton";
-
+import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   const { loading, data, error } = useFetch<void, ApiResponse<Event[]>>(
@@ -64,7 +64,12 @@ export default function Home() {
             {data.data.map((e) => (
               <Link key={e.id} href={"/e/" + e.slug}>
                 <div className="">
-                  <h2 className="text-lg font-semibold">{e.name}</h2>
+                  <div className="flex gap-2 items-center">
+                    <h2 className="text-lg font-semibold">{e.name}</h2>{" "}
+                    <Badge variant={"outline"}>
+                      {e.isPrivate ? "Private" : "Public"}
+                    </Badge>
+                  </div>
                   <p className="text-muted-foreground">
                     {e.description.slice(0, 150)}
                   </p>

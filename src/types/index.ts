@@ -4,6 +4,7 @@ export type CreateEventFormData = {
     slug: string;
     description: string;
     eventDate: string;
+    isPrivate: boolean;
 };
 
 export type ApiResponse<T> = {

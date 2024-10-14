@@ -14,13 +14,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import useFetch from "@/hooks/useFetch";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ApiResponse, GetUploadsResponse } from "@/types";
 import Loader from "@/components/ui/loader";
+import EmptyState from "@/components/ui/empty";
+import { List, Grid, Plus, ChevronLeft } from "lucide-react";
 
 export default function Home() {
   const params = useParams();
   const eventSlug = params["event-slug"];
+  const [viewMode, setViewMode] = React.useState<"grid" | "list">("grid");
+  const router = useRouter();
 
   const {
     loading,
@@ -32,14 +36,25 @@ export default function Home() {
 
   return (
     <div>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold">{data?.data.name}</h1>
-          <UploadModal onUploadSuccess={getEventDetails} />
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex gap-2 items-center">
+          <Button size={"icon"} variant={"ghost"} onClick={() => router.back()}>
+            <ChevronLeft />
+          </Button>
+          <h1 className="text-lg md:text-xl font-semibold">
+            {data?.data.name}
+          </h1>
         </div>
-        <p className="text-muted-foreground text-sm w-4/5">
-          {data?.data.description}
-        </p>
+        <div className="flex gap-2">
+          <UploadModal onUploadSuccess={getEventDetails} />
+          <Button
+            size="icon"
+            variant={"outline"}
+            onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
+          >
+            {viewMode === "grid" ? <List /> : <Grid />}
+          </Button>
+        </div>
       </div>
 
       {loading && (
@@ -49,7 +64,11 @@ export default function Home() {
         </div>
       )}
       {data && (
-        <PhotosGallery photos={data.data.uploads.map((d) => d.files).flat()} />
+        <PhotosGallery
+          onUploadSuccess={getEventDetails}
+          photos={data.data.uploads.map((d) => d.files).flat()}
+          viewMode={viewMode}
+        />
       )}
     </div>
   );
@@ -57,8 +76,12 @@ export default function Home() {
 
 function PhotosGallery({
   photos,
+  onUploadSuccess,
+  viewMode,
 }: {
   photos: Array<{ publicURL: string; id: string }>;
+  onUploadSuccess: Function;
+  viewMode: "grid" | "list";
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -107,35 +130,76 @@ function PhotosGallery({
       });
   }, []);
 
-  return (
-    <div
-      ref={containerRef}
-      className="h-[calc(100vh-81px)] overflow-y-scroll space-y-2"
-      style={{ scrollSnapType: "y mandatory" }}
-    >
-      {photos.map((file) => (
-        <div
-          key={file.id}
-          className="h-[95%] w-full relative bg-slate-400 rounded overflow-hidden image-content transition-all duration-1000"
-          style={{ scrollSnapAlign: "center" }}
-        >
+  if (photos.length === 0) {
+    return (
+      <div className="h-[calc(80vh)] w-full flex gap-4 flex-col items-center justify-center">
+        <EmptyState width="150" height="150" />
+        <p className="text-center text-sm text-muted-foreground">
+          No images found
+        </p>
+        <UploadModal
+          onUploadSuccess={onUploadSuccess}
+          uploadTrigger={
+            <Button>
+              <Plus />
+              Upload Image
+            </Button>
+          }
+        />
+      </div>
+    );
+  } else if (viewMode === "list") {
+    return (
+      <div
+        ref={containerRef}
+        className="h-[calc(100vh-81px)] overflow-y-scroll space-y-2"
+        style={{ scrollSnapType: "y mandatory" }}
+      >
+        {photos.map((file) => (
+          <div
+            key={file.id}
+            className="h-[95%] w-full relative bg-slate-400 rounded overflow-hidden image-content transition-all duration-1000"
+            style={{ scrollSnapAlign: "center" }}
+          >
+            <Image
+              src={file.publicURL}
+              width={400}
+              height={400}
+              alt=""
+              className="object-cover h-full w-full"
+            />
+            {/* <div className="absolute bottom-0 left-0 px-4 py-2">
+                <p>{upload.text}</p>
+              </div> */}
+          </div>
+        ))}
+      </div>
+    );
+  } else {
+    return (
+      <div className="grid grid-cols-3 md:grid-cols-4 gap-1 my-6">
+        {photos.map((file) => (
           <Image
+            key={file.id}
             src={file.publicURL}
             width={400}
             height={400}
             alt=""
-            className="object-cover h-full w-full"
+            className="aspect-square object-cover"
           />
-          {/* <div className="absolute bottom-0 left-0 px-4 py-2">
-                <p>{upload.text}</p>
-              </div> */}
-        </div>
-      ))}
-    </div>
-  );
+        ))}
+      </div>
+    );
+  }
 }
 
-function UploadModal({ onUploadSuccess }: { onUploadSuccess: Function }) {
+function UploadModal({
+  onUploadSuccess,
+  uploadTrigger,
+}: {
+  onUploadSuccess: Function;
+  uploadTrigger?: React.ReactNode;
+}) {
   const params = useParams();
   const eventSlug = params["event-slug"];
   const [open, setOpen] = React.useState(false);
@@ -175,7 +239,14 @@ function UploadModal({ onUploadSuccess }: { onUploadSuccess: Function }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size={"sm"}>Upload Images</Button>
+        {uploadTrigger ? (
+          uploadTrigger
+        ) : (
+          <Button className="w-9 p-0 md:w-auto md:px-5 md:py-2">
+            <Plus />
+            <span className="md:inline-block hidden">Upload Images</span>
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

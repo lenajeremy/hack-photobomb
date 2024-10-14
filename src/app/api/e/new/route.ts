@@ -12,17 +12,18 @@ export async function POST(request: NextRequest) {
     if (session === null) {
         return respondError(new Error("User not authenticated"), undefined, 401)
     }
-    
+
     try {
         const body = await request.json() as CreateEventFormData;
-        if (body.name && body.slug && body.description && body.eventDate) {
+        if (body.name && body.slug && body.description && body.eventDate && body.isPrivate !== undefined) {
             const event = await prisma.event.create({
                 data: {
                     name: body.name,
                     slug: body.slug,
                     description: body.description,
                     eventDate: new Date(body.eventDate),
-                    ownerId: session.user?.id ?? ""
+                    ownerId: session.user?.id ?? "",
+                    isPrivate: body.isPrivate ?? false,
                 }
             })
             return respondSuccess(event, "Event created successfully", 200);

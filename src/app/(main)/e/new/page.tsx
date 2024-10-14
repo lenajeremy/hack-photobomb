@@ -12,6 +12,8 @@ import useFetch from "@/hooks/useFetch";
 import { toast } from "sonner";
 import Loader from "@/components/ui/loader";
 import { useRouter } from "next/navigation";
+import { Check, XSquare } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 export default function CreateEvent() {
   const router = useRouter();
@@ -20,11 +22,13 @@ export default function CreateEvent() {
       defaultValues: {
         name: "",
         slug: "",
+        isPrivate: false,
       },
     });
 
   const name = watch("name");
   const slug = watch("slug");
+  const isPrivate = watch("isPrivate");
 
   const { trigger: createEvent, loading } = useFetch<
     CreateEventFormData,
@@ -54,7 +58,7 @@ export default function CreateEvent() {
         console.log(err);
       }
     },
-    [createEvent]
+    [createEvent, router]
   );
 
   React.useEffect(() => {
@@ -63,75 +67,90 @@ export default function CreateEvent() {
   }, [name, setValue]);
 
   return (
-    <div className="p-4">
-      <form onSubmit={handleSubmit(handleCreateEvent)}>
-        <div className="flex flex-col text-center gap-1">
-          <h1 className="text-2xl font-semibold">create event</h1>
-          <p className="text-muted-foreground text-sm">create a new event👍</p>
+    <div className="flex items-center justify-center pt-16">
+      <div className="p-4 w-[24rem]">
+        <div className="flex flex-col text-center gap-1 w-4/5 mx-auto">
+          <h1 className="text-2xl font-semibold">Create event</h1>
+          <p className="text-muted-foreground text-sm">
+            Create a special image repository for your event.
+          </p>
         </div>
-
-        <div className="space-y-4 mt-6">
-          <div className="space-y-1">
-            <Label className="text-sm">event name:</Label>
-            <Input
-              placeholder="enter the name of your event"
-              {...register("name", { required: true })}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label className="text-sm">url path:</Label>
-            <div className="space-y-2">
+        <form onSubmit={handleSubmit(handleCreateEvent)}>
+          <div className="space-y-3 mt-6">
+            <div className="space-y-1">
+              <Label className="text-sm">Event name:</Label>
               <Input
-                placeholder="unique url path for your event"
-                {...register("slug", { required: true })}
+                placeholder="Enter the name of your event"
+                {...register("name", { required: true })}
               />
-              <p className="text-xs">
-                {verifySlugLoading && (
-                  <span className="inline-flex gap-2 text-muted-foreground">
-                    <Loader className="w-[18px]" />
-                    <span>Verifying slug availability...</span>
-                  </span>
-                )}
-
-                {verifySlugError && (
-                  <span className="text-red-500">
-                    <span>Slug is already taken</span>
-                  </span>
-                )}
-
-                {verifySlugData && (
-                  <span className="text-green-600">
-                    <span>Slug is available</span>
-                  </span>
-                )}
-              </p>
             </div>
-          </div>
+            <div className="space-y-1">
+              <Label className="text-sm">Slug:</Label>
+              <div className="space-y-2">
+                <Input
+                  placeholder="unique url path for your event"
+                  {...register("slug", { required: true })}
+                />
+                <p className="text-xs">
+                  {verifySlugLoading && (
+                    <span className="inline-flex gap-2 text-muted-foreground">
+                      <Loader className="w-[18px]" />
+                      <span>Verifying slug availability...</span>
+                    </span>
+                  )}
 
-          <div className="space-y-1">
-            <Label className="text-sm">date:</Label>
-            <Input
-              type="date"
-              placeholder="when is your event happening?"
-              className="text-left"
-              {...register("eventDate", { required: true })}
-            />
-          </div>
+                  {verifySlugError && (
+                    <span className="text-red-500 inline-flex gap-2">
+                      <XSquare className="w-[18px] h-[18px]" />
+                      <span>Slug is already taken</span>
+                    </span>
+                  )}
 
-          <div className="space-y-1">
-            <Label className="text-sm">description:</Label>
-            <Textarea
-              placeholder="description of your event"
-              className="h-[140px]"
-              {...register("description")}
-            />
+                  {verifySlugData && (
+                    <span className="text-green-600 inline-flex gap-2">
+                      <Check className="w-[18px] h-[18px]" />
+                      <span>Slug is available</span>
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-sm">Date of Event:</Label>
+              <Input
+                type="date"
+                placeholder="when is your event happening?"
+                className="text-left"
+                {...register("eventDate", { required: true })}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-sm">Description:</Label>
+              <Textarea
+                placeholder="description of your event"
+                className="h-[140px]"
+                {...register("description")}
+              />
+            </div>
+            <div className="space-y-1 pb-2">
+              <Label className="text-sm">Private Event?</Label>
+              <div className="flex items-center justify-between gap-6">
+                <p className="text-muted-foreground text-sm">
+                  When you set an event as private, only people with the link
+                  can view your event.
+                </p>
+                <Switch
+                  checked={isPrivate}
+                  onCheckedChange={(v) => setValue("isPrivate", v)}
+                />
+              </div>
+            </div>
+            <Button loading={loading} className="w-full">
+              Create
+            </Button>
           </div>
-          <Button loading={loading} className="w-full bg-purple-500 text-white">
-            create
-          </Button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

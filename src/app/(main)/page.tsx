@@ -8,13 +8,13 @@ import { ApiResponse } from "@/types";
 import { Event } from "@prisma/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import EmptyState from "@/components/ui/empty";
 
 export default function Home() {
-  const { loading, data, error } = useFetch<void, ApiResponse<Event[]>>(
-    "/api/e",
-    {},
-    { fetchOnRender: true }
-  );
+  const { loading, data, error } = useFetch<
+    void,
+    ApiResponse<(Event & { attendees: number })[]>
+  >("/api/e", {}, { fetchOnRender: true });
 
   return (
     <div>
@@ -61,6 +61,14 @@ export default function Home() {
 
         {data && (
           <div className="flex flex-col gap-2">
+            {data.data.length === 0 && (
+              <div className="h-[80vh] w-full flex flex-col items-center justify-center gap-2">
+                <EmptyState width="100" height="100" />
+                <p className="text-center text-sm text-muted-foreground">
+                  No events found
+                </p>
+              </div>
+            )}
             {data.data.map((e) => (
               <Link key={e.id} href={"/e/" + e.slug}>
                 <div className="">
@@ -73,6 +81,7 @@ export default function Home() {
                   <p className="text-muted-foreground">
                     {e.description.slice(0, 150)}
                   </p>
+                  <p>{e.attendees} attendees</p>
                   <p>Date: {new Date(e.eventDate).toLocaleDateString()}</p>
                 </div>
               </Link>

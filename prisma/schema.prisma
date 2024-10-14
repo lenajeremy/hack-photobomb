@@ -47,19 +47,19 @@ model VerificationToken {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
-    name          String    @default("User")
-    email         String?   @unique
-    emailVerified DateTime? @map("email_verified")
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    files         File[]
-    events        Event[]   @relation(name: "events")
-    uploads       Upload[]  @relation(name: "uploads")
-    Event         Event[]
+    id               String             @id @default(cuid())
+    createdAt        DateTime           @default(now())
+    updatedAt        DateTime           @updatedAt
+    name             String             @default("User")
+    email            String?            @unique
+    emailVerified    DateTime?          @map("email_verified")
+    image            String?
+    accounts         Account[]
+    sessions         Session[]
+    files            File[] // Files owned by the user
+    events           Event[]            @relation(name: "events") // Events owned by the user
+    Upload           Upload[] @relation(name: "uploads") // Uploads owned by the user
+    EventParticipant EventParticipant[]
 
     @@map("users")
 }
@@ -77,11 +77,34 @@ model Event {
     ownerId String
     owner   User   @relation(name: "events", fields: [ownerId], references: [id], onDelete: Cascade)
 
-    participants User[]
     files        File[]
-    uploads      Upload[] @relation(name: "uploads")
+    uploads      Upload[]           @relation(name: "uploads")
+    links        ShareLink[]
+    participants EventParticipant[]
 
     @@map("events")
+}
+
+model EventParticipant {
+    userId  String
+    eventId String
+
+    user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+    @@id([userId, eventId])
+    @@map("event_participants")
+}
+
+model ShareLink {
+    id        String   @id @default(cuid())
+    eventId   String
+    event     Event    @relation(fields: [eventId], references: [id])
+    link      String   @unique @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("share_links")
 }
 
 model File {
@@ -90,7 +113,7 @@ model File {
     publicURL String
     owner     User   @relation(fields: [ownerId], references: [id])
     ownerId   String
-    event     Event  @relation(fields: [eventId], references: [id])
+    event     Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
     eventId   String
     upload    Upload @relation(fields: [uploadId], references: [id])
     uploadId  String
@@ -105,7 +128,7 @@ model Upload {
     text      String?  @db.Text
     files     File[]
     createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     ownerId String
     owner   User   @relation(name: "uploads", fields: [ownerId], references: [id], onDelete: Cascade)

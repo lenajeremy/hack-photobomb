@@ -11,10 +11,23 @@ export async function GET() {
         try {
             const userEvents = await prisma.event.findMany({
                 where: {
-                    ownerId: session.user?.id
+                    participants: {
+                        some: {
+                            userId: session.user?.id
+                        },
+                    }
                 }
             })
-            return respondSuccess(userEvents, "Events retrieved successfully", 200)
+
+            const userEventsWithAttendees = await Promise.all(userEvents.map(async e => ({
+                ...e, attendees: await prisma.eventParticipant.count({
+                    where: {
+                        eventId: e.id
+                    }
+                })
+            })))
+
+            return respondSuccess(userEventsWithAttendees, "Events retrieved successfully", 200)
         } catch (error) {
             console.log(error)
             respondError(error instanceof Error ? error : new Error(String(error)), "Failed to get user events", 500);

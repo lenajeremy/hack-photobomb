@@ -26,7 +26,19 @@ export async function POST(request: NextRequest) {
                     isPrivate: body.isPrivate ?? false,
                 }
             })
-            return respondSuccess(event, "Event created successfully", 200);
+
+            const ownerasParticipant = await prisma.eventParticipant.create({
+                data: {
+                    userId: session.user?.id ?? "",
+                    eventId: event.id ?? "",
+                }
+            })
+
+            if (event && ownerasParticipant) {
+                return respondSuccess(event, "Event created successfully", 200);
+            } else {
+                return respondError(new Error("Failed to create event"), undefined, 500);
+            }
         } else {
             return respondError(new Error("Invalid request body"), undefined, 400);
         }

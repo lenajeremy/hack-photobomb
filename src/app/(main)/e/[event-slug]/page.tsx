@@ -18,7 +18,15 @@ import { useParams, useRouter } from "next/navigation";
 import { ApiResponse, GetUploadsResponse } from "@/types";
 import Loader from "@/components/ui/loader";
 import EmptyState from "@/components/ui/empty";
-import { List, Grid, Plus, ChevronLeft } from "lucide-react";
+import { List, Grid, Plus, ChevronLeft, Share2 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ShareLink } from "@prisma/client";
+import { toast } from "sonner";
 
 export default function Home() {
   const params = useParams();
@@ -34,6 +42,28 @@ export default function Home() {
     fetchOnRender: true,
   });
 
+  const { trigger: createShareLink, loading: isCreatingLink } = useFetch<
+    void,
+    ApiResponse<ShareLink>
+  >(`/api/join/${eventSlug}`, { method: "POST" });
+
+  const handleShare = React.useCallback(async () => {
+    try {
+      const res = await createShareLink();
+      const d = {
+        text: "Joining event gives you access to all the images",
+        title: `Click to join "${data?.data.name}" event`,
+        url: `${window.location.origin}/join/${res?.data.link}`,
+      };
+      await navigator.clipboard.writeText(d.url);
+      const shareres = await navigator.share(d);
+      console.log(shareres);
+      toast.success("Link shared successfully");
+    } catch (err) {
+      toast.error(JSON.stringify(err));
+    }
+  }, [data]);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
@@ -47,13 +77,45 @@ export default function Home() {
         </div>
         <div className="flex gap-2">
           <UploadModal onUploadSuccess={getEventDetails} />
-          <Button
-            size="icon"
-            variant={"outline"}
-            onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-          >
-            {viewMode === "grid" ? <List /> : <Grid />}
-          </Button>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant={"outline"}
+                  onClick={() =>
+                    setViewMode(viewMode === "grid" ? "list" : "grid")
+                  }
+                >
+                  {viewMode === "grid" ? <List /> : <Grid />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-muted-foreground">
+                  {viewMode === "grid" ? "List View" : "Grid View"}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant={"outline"}
+                  onClick={handleShare}
+                  loading={isCreatingLink}
+                >
+                  <Share2 />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-muted-foreground">Share Link</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 
@@ -133,7 +195,7 @@ function PhotosGallery({
   if (photos.length === 0) {
     return (
       <div className="h-[calc(80vh)] w-full flex gap-4 flex-col items-center justify-center">
-        <EmptyState width="150" height="150" />
+        <EmptyState width="100" height="100" />
         <p className="text-center text-sm text-muted-foreground">
           No images found
         </p>
@@ -238,16 +300,27 @@ function UploadModal({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {uploadTrigger ? (
-          uploadTrigger
-        ) : (
-          <Button className="w-9 p-0 md:w-auto md:px-5 md:py-2">
-            <Plus />
-            <span className="md:inline-block hidden">Upload Images</span>
-          </Button>
-        )}
-      </DialogTrigger>
+      {uploadTrigger ? (
+        <DialogTrigger asChild>uploadTrigger</DialogTrigger>
+      ) : (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DialogTrigger asChild>
+                <Button className="w-9 p-0 md:w-auto md:px-5 md:py-2">
+                  <Plus />
+                  <span className="md:inline-block hidden">Upload Images</span>
+                </Button>
+              </DialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-muted-foreground">
+                Upload images from your event
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Upload Files</DialogTitle>
